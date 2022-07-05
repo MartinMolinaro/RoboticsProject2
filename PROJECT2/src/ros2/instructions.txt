@@ -123,3 +123,4 @@ ________________________________________________________________________________
 5. Due to bugs of Rviz, it may be necessary to run the launch a second time if you see that is not running properly (high temperature may also affect the performances)
 6. If you want to change bag, it is necessary to rerun also the launch to reload rviz
 7. (we didn't redefined the tf static for the base footprint since it was matching with the base_link frame)
+
