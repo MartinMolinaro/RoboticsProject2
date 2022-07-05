@@ -1,0 +1,125 @@
+PROJECT 2 INSTRUCTIONS
+
+
+-TEAM:  - Francesca Nava
+        - Martin Molinaro
+_____________________________________________________________________________________________________________________________
+
+-ARCHIVE DESCRIPTION:
+
+        - this instruction.txt file
+        - tf tree structure pdf (frames.png)
+        - CMakeLists.txt
+        - package.xml
+        - src folder with executables for odom tf broadcasting (ComputeOdometry.cpp) and for laser merging (ira_laser_tools license: laserscan_multi_merger.cpp)
+        - rviz folder with graphic configurations
+        - maps folder with saved maps (1 map (bag2), 2 maps with path (bag1&3))
+        - launch folder with: 
+                             - gmapping launcher (gmap.launch)
+                             - amcl launcher (amcl.launch)
+                             - launcher for plotting the path on the saved maps (mappath.launch)
+_____________________________________________________________________________________________________________________________
+
+-HOW TO RUN:
+
+(in addition to the ones used in the lab, these pkg are required)
+INSTALL:
+sudo apt-get install ros-melodic-hector-slam
+sudo apt-get install ros-melodic-hector-geotiff
+
+   _____________________________________________________________________________________________________________________________
+0. BEFORE STARTING:
+
+   -Terminal 1:    
+
+   >> cd robotics
+   >> catkin_make
+   _____________________________________________________________________________________________________________________________
+1. FOR MAPPING:
+
+   -Terminal 1: start the gmap.launch with the following command:
+
+   >> roslaunch project2 gmap.launch
+   _____________________________________________________________________________________________________________________________
+  
+   -Terminal 2: After rviz has loaded, play the bag2 for mapping (after cd to the bags folder):
+
+   >> rosbag play --clock robotics2_final.bag
+   _____________________________________________________________________________________________________________________________
+
+   -Terminal 3: To save the map in the maps folder:
+
+   >> cd robotics/src/ros2/maps
+   >> rosrun map_server map_saver -f map
+    
+    (please save the map you want to use for localization as "map", because it's included in the launch folder with this name)
+   _____________________________________________________________________________________________________________________________
+2. FOR LOCALIZATION:
+
+   -Terminal 1: start the amcl.launch with the following command:
+
+   >> roslaunch project2 amcl.launch
+   
+   _____________________________________________________________________________________________________________________________
+
+   -Terminal 2: play bag 1 or 3
+
+   >> rosbag play --clock robotics1_final.bag
+   or
+   >> rosbag play --clock robotics3_final.bag
+
+   _____________________________________________________________________________________________________________________________
+3. FOR SAVING THE PATH IMAGES:
+
+   -Terminal 1: start the mappath.launch
+   
+   >> roslaunch project2 mappath.launch
+   
+   _____________________________________________________________________________________________________________________________
+
+   -Terminal 2: play bag1 or bag3 to save the path on saved map from bag2:
+
+   >> rosbag play --clock robotics1_final.bag
+   or
+   >> rosbag play --clock robotics3_final.bag
+
+   _____________________________________________________________________________________________________________________________
+
+   -Terminal 3: save, in folder maps, the path on the map in high resolution tif images, with also the timestamp in the name:
+
+   >> rostopic pub syscommand std_msgs/String "savegeotiff"
+
+_________________________________________________________________________________________________________________________________
+
+- COMMANDS SUMMARY:
+
+FOR BAGS:
+rosbag play --clock robotics1_final.bag
+rosbag play --clock robotics2_final.bag
+rosbag play --clock robotics3_final.bag
+
+
+FOR LAUNCHERS:
+roslaunch project2 gmap.launch
+roslaunch project2 amcl.launch
+roslaunch project2 mappath.launch
+
+FOR SAVING IMAGES (saving in maps folder):
+just map: 
+         cd robotics/src/ros2/maps
+         rosrun map_server map_saver -f map
+         
+map+path: 
+         rostopic pub syscommand std_msgs/String "savegeotiff"
+
+__________________________________________________________________________________________________________________________________         
+
+-COMMENTS:
+
+1. We did not implement the service to save the path images because hector_geotiff already provided this function using the simple command above
+2. We used bag2 for mapping beacuse it provided very similar results wrt bag1, but the duration was shorter
+3. For the amcl localization you can see the particles in orange, the position estimate in green with its error ellipse (covariance) and the odometry provided in red, since we verified that the odometry and the estimation always match, we used directly the odometry for path creation, since it is also more compatible with hector_geotiff.
+4. For the merging of the laser scans we used the merger node from a licensed ros pkg ira_laser_tools
+5. Due to bugs of Rviz, it may be necessary to run the launch a second time if you see that is not running properly (high temperature may also affect the performances)
+6. If you want to change bag, it is necessary to rerun also the launch to reload rviz
+7. (we didn't redefined the tf static for the base footprint since it was matching with the base_link frame)
