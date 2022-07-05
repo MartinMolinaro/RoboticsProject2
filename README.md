@@ -1,3 +1,3 @@
-# RoboticsProject2
-Robotics polimi course (Matteucci) project 2
+# RoboticsProject2_21-22
+
 The instructions are in the main folder PROJECT2
